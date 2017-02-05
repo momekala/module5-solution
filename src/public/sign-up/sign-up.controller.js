@@ -4,25 +4,22 @@
 angular.module('public')
 .controller('SignUpController', SignUpController);
 
-SignUpController.$inject = ['MyInfoService'];
-function SignUpController(MyInfoService) {
+SignUpController.$inject = ['MyInfoService','MenuService'];
+function SignUpController(MyInfoService, MenuService) {
   var $ctrl = this;
-  $ctrl.saved = false;
+
   $ctrl.user = {};
   $ctrl.menuItem = {};
 
-  $ctrl.submit = function () {
-    MyInfoService.saveUserInfo($ctrl.user);
-    var menuItem =  MyInfoService.checkMenuItem($ctrl.user);
-    menuItem.then(function (response) {
-      $ctrl.menuItem = MyInfoService.getMenuItem();
-      $ctrl.user = MyInfoService.getUserInfo();
-      $ctrl.saved =  MyInfoService.isSaved();
-    })
-    .catch((err) => {
-      $ctrl.user = MyInfoService.getUserInfo();
-      $ctrl.saved = MyInfoService.isSaved();
-    })
+  $ctrl.submit = function() {
+    MenuService.getMenuItem($ctrl.user.favmenuitem).then(function successCallback(response) {
+      $ctrl.user.menuItemTitle = response.name;
+      $ctrl.user.menuItemDescription = response.description;
+      MyInfoService.saveUserInfo($ctrl.user);
+    }, function errorCallback(response) {
+      $ctrl.user.menuItemTitle = false;
+      $ctrl.user.menuItemDescription = false;
+    });
   };
 }
 
